@@ -6,10 +6,10 @@ import com.thread.demo.Cat;
 import com.thread.demo.CatThreadService;
 
 public class JobDemo extends JobBase{
-
+	private int i = 0;
 	@Override
 	public void lockDate() {
-		System.out.println("lockDate");
+		System.out.println("lockDate"+i+"---"+Thread.currentThread().getName());
 	}
 
 	@Override
@@ -23,6 +23,8 @@ public class JobDemo extends JobBase{
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+		System.err.println("000000"+Thread.currentThread().getName()+",,"+i+++"==");
+		
 	}
 
 }
