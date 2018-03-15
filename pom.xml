@@ -24,5 +24,6 @@
   </dependencies>
   <modules>
   	<module>quartzDemo</module>
+  	<module>QuartzSpring</module>
   </modules>
 </project>
