@@ -48,13 +48,13 @@ public class JpaTest {
 		
 		Query succQuery = em.createNativeQuery("select "
 				+ " compare_channel ,channel_desc,count(txn_amt),count(count) from ccs_compared_back"
-				+ "where return_code = ? group by compare_channel,channel_desc");
+				+ " where return_code = ? group by compare_channel,channel_desc");
 		succQuery.setParameter(1, 1);
 		List<Object[]> succList = succQuery.getResultList();
 		
 		Query failQuery = em.createNativeQuery("select "
 				+ " compare_channel ,channel_desc,count(txn_amt),count(count) from ccs_compared_back"
-				+ "where return_code = ? group by compare_channel,channel_desc");
+				+ " where return_code = ? group by compare_channel,channel_desc");
 		succQuery.setParameter(1, 2);
 		List<Object[]> failList = failQuery.getResultList();
 		for (Object[] objects : channelList) {
