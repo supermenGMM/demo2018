@@ -11,12 +11,10 @@ public class CatThreadService<V> {
 		ExecutorService executorService = Executors.newFixedThreadPool(10);
 		ExecutorCompletionService<Cat> completionService = new ExecutorCompletionService<Cat>(executorService);
 		Future<Cat> submit = completionService.submit(new CatThread());
-		Cat cat = completionService.take().get();
-		/*for (int i = 0; i < 10; i++) {
-			
-			System.out.println(cat+",i:"+i);
-			System.out.println(Thread.currentThread());
-		}*/
+		for (int i = 0; i < 10; i++) {
+			Cat cat = completionService.take().get();
+			System.out.println(cat);
+		}
 		executorService.shutdown();
 	}
 }
