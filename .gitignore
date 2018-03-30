@@ -1,7 +1,11 @@
-*/target/
-.setting/*
-.git/*
-.project
-.classpath
-*/classes/*
+*/target/*
 
+.classpath
+.project
+.settings/*
+*/classes/*
+/classes
+*/*.properties
+.project
+*/.classpath
+*/.project
