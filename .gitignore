@@ -11,4 +11,7 @@
 target/*
 */.settings/*
 */*.class
+*.class
+*.project
+
 
