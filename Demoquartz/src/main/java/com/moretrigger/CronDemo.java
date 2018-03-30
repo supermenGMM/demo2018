@@ -8,6 +8,7 @@ import java.util.Date;
 
 import org.quartz.DateBuilder;
 import org.quartz.DateBuilder.IntervalUnit;
+import org.quartz.JobBuilder;
 import org.quartz.JobDetail;
 import org.quartz.Scheduler;
 import org.quartz.SchedulerException;
@@ -15,12 +16,14 @@ import org.quartz.SimpleTrigger;
 import org.quartz.Trigger;
 import org.quartz.impl.StdSchedulerFactory;
 
+import com.mm.demo4.Job2;
+
 public class CronDemo {
 	public static void main(String[] args) {
 		try {
 			Scheduler scheduler = StdSchedulerFactory.getDefaultScheduler();
 			scheduler.start();
-			JobDetail job1 = newJob(Job1.class).withIdentity("job1", "group1")
+			JobDetail job1 = JobBuilder.newJob(Job2.class).withIdentity("job1", "group1")
 					.build();
 			// 定时执行\,之后重复
 			Calendar calendar = Calendar.getInstance();

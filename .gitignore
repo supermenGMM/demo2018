@@ -8,4 +8,7 @@
 .project
 */.classpath
 */.project
+target/*
+*/.settings/*
+*/*.class
 
