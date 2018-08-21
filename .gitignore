@@ -11,4 +11,8 @@
 target/*
 */.settings/*
 */*.class
+.idea/*
+*/.idea/*
+*.iml
+*/*.iml
 
