@@ -1,11 +1,9 @@
 package com.mm;
 
-import javafx.print.PageOrientation;
-import jdk.nashorn.internal.scripts.JD;
 import org.junit.Test;
 import redis.clients.jedis.*;
 
-import javax.sound.midi.Soundbank;
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -16,7 +14,7 @@ public class test {
         Jedis jedis = new Jedis("10.3.200.4");
 //        Jedis jedis = new Jedis("192.168.55.134");
 
-        jedis.set("foo", "bar");
+        jedis.set("a", "bar");
         System.out.println(jedis.get("foo"));
         jedis.close();
     }
@@ -78,6 +76,7 @@ public class test {
 
     /**
      * pipelining
+     * 类似于事物。批量执行命令，在管道流同步前获取数据集，在管道流同步之后才能get数据。是futuer的一种
      */
     @Test
     public void pipelining() {
@@ -95,6 +94,102 @@ public class test {
         pipelined.sync();
         System.out.println(q.get());
         System.out.println(sing.get().size());
+    }
+
+
+    /**
+     * 发布订阅
+     */
+    @Test
+    public void pubsub() {
+        Jedis jedis = new Jedis(host2);
+        MyListener listener = new MyListener();
+        jedis.subscribe(listener,"channel1");
+
+    }
+
+    /**
+     * shardedJedis
+     *  //1.direct connection
+     */
+    // TODO 用shard赋值。如果已经有key a:12,那么赋值a:foo 就不能成功。为什么。
+    @Test
+    public void shaardedJedisByShard() {
+        List<JedisShardInfo> list = new ArrayList<JedisShardInfo>();
+        JedisShardInfo si = new JedisShardInfo(host2, 6379);
+//        si.setPassword("foobared");
+
+        JedisShardInfo si2 = new JedisShardInfo(host2, 6380);
+//        si2.setPassword("foobared");
+
+        list.add(si);
+        list.add(si2);
+
+
+        ShardedJedis jedis = new ShardedJedis(list,ShardedJedis.DEFAULT_KEY_TAG_PATTERN);//? TODO 不明白怎么用。什么意思.Force certain keys to go to the same shard
+        jedis.set("foo{bar}", "12345");// TODO
+        jedis.set("car{bar}", "67890");
+
+        JedisShardInfo jedisShardInfo = jedis.getShardInfo("a");
+        System.out.println(jedisShardInfo.getHost()+","+jedisShardInfo.getPort()
+        +","+jedisShardInfo.getPassword()+","+jedisShardInfo.getConnectionTimeout()
+        +","+jedisShardInfo.getName()+"====");
+        jedis.set("a", "foo");
+
+        String a = jedis.get("a");
+        System.out.println(a);
+        jedis.disconnect();
+
+
+    }
+
+    /**
+     * shardedJedis
+     *  // 2. pooled connection
+     */
+    @Test
+    public void shaardedJedisByPool() {
+        List<JedisShardInfo> list = new ArrayList<JedisShardInfo>();
+        JedisShardInfo si = new JedisShardInfo(host2, 6379);
+//        si.setPassword("foobared");
+
+        JedisShardInfo si2 = new JedisShardInfo(host2, 6380);
+//        si2.setPassword("foobared");
+
+        list.add(si);
+        list.add(si2);
+
+
+        JedisPoolConfig jedisPoolConfig = new JedisPoolConfig();
+        ShardedJedisPool pool = new ShardedJedisPool(jedisPoolConfig, list);
+        try (ShardedJedis jedis1 = pool.getResource()){
+            JedisShardInfo jedisShardInfo = jedis1.getShardInfo("a");
+            System.out.println(jedisShardInfo.getHost()+","+jedisShardInfo.getPort()
+                    +","+jedisShardInfo.getPassword()+","+jedisShardInfo.getConnectionTimeout()
+                    +","+jedisShardInfo.getName()+"====");
+            jedis1.set("a", "foo222");
+        }
+        try (ShardedJedis jedis2 = pool.getResource()){
+            JedisShardInfo jedisShardInfo = jedis2.getShardInfo("a");
+            System.out.println(jedisShardInfo.getHost()+","+jedisShardInfo.getPort()
+                    +","+jedisShardInfo.getPassword()+","+jedisShardInfo.getConnectionTimeout()
+                    +","+jedisShardInfo.getName()+"====");
+            jedis2.set("z", "bar");
+        }
+        pool.close();
+    }
+
+    /**
+     * 主从
+     */
+    @Test
+    public void masterSlave() {
+        Jedis jedis = new Jedis(host2);
+        String slaveof = jedis.slaveof(host2, 6380);
+        System.out.println(slaveof);
+        jedis.slaveofNoOne();
+        jedis.set("mm", "zhaomeng");
+        jedis.close();
     }
 
     /**
